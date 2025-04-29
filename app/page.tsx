@@ -1,103 +1,179 @@
-import Image from "next/image";
+'use client';
+/*
+Next.jsの**App Router（/appディレクトリ配下）**では、
+**デフォルトはサーバーサイド（SSR）**で動きます。
+なので、こう書かないと**「useStateなどのクライアント専用機能」が使えない**。
+意味：
+「このファイル（ページ）はブラウザ側（クライアント）で動かすよ」という宣言。
+*/
+import { useState, useEffect } from 'react';
+/*
+React標準機能の**useState（状態管理フック）**を使う宣言です。
+これにより、「タスク一覧」などのデータをブラウザメモリ上に保持できるようになる。
+*/
+type Task = {
+  id: number;
+  title: string;
+  completed: boolean;
+};
+/*これはtypescriptの型宣言 */
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  /*
+Homeコンポーネントを定義して、それをデフォルトエクスポートしてる。
+「export default」は、このファイルで1個だけ"主役"の関数を外部に出す、という意味。
+Next.jsでは、
+/app/page.tsx に export defaultされたコンポーネントが
+自動的に**トップページ ("/")**に対応する仕組みになってる。
+まとめ：「トップページに表示するコンポーネント(Home)を定義して外に出している」
+  */ 
+  const [tasks, setTasks] = useState<Task[]>([]);
+  /*
+**tasks＝タスク一覧（配列）**のデータを持つ
+setTasks＝そのタスク一覧を更新する関数
+初期値は[]（空の配列）
+<Task[]> と書くことで、「この配列はTask型のデータを入れる」と型制約をかけてる
+まとめ：「タスクのリストをメモリ上に管理するuseState」
+  */
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  /*
+新しく入力中のタスクのタイトルを持つ状態管理。
+初期値は''（空文字列）
+setNewTaskTitleで、フォームに文字を入力するたびに更新する。
+まとめ：「ユーザーが今書いてるタスクの名前を保持」
+  */
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const handleAddTask = () => {
+    /* タスク追加ボタンを押したときに実行される関数。*/
+    if (!newTaskTitle.trim()) return;
+    /* 
+入力されたタイトルの前後空白を除去
+もし完全に空なら何もしないで終了（タスク追加しない）
+   */
+    const newTask: Task = {
+      /*
+      新しいタスクデータを作っている。
+      ここで1個のタスクオブジェクト（Task型）を生成してる。 
+      */
+      id: Date.now(),/* 今この瞬間のタイムスタンプ（ミリ秒単位）を使って一意のIDを作成している。 */
+      title: newTaskTitle.trim(), /* ユーザーが入力した文字列を、空白除去してそのままタイトルにセットしている。 */
+      completed: false, /* まだ完了していないので、初期状態は必ずfalseにする。 */
+    };
+    setTasks([...tasks, newTask]);
+    /*
+    今のtasks配列を**展開（スプレッド構文）**して
+    その末尾にnewTaskを追加して、新しい配列にして更新している。
+    （Reactでは**直接配列をいじらず、「新しい配列を作ってsetする」**のが原則）
+    */
+    setNewTaskTitle('');
+    /*
+    タスクを追加した後、
+    フォームの入力欄を空にリセットしている。
+    */
+  };
+
+  const handleToggleComplete = (id: number) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
+  /*
+  id（クリックされたタスクのID）を受け取る
+  tasks配列をmap()で全件ループ
+  1件ずつtask.idと渡されたidを比較する
+  task.id === id（対象タスク）	completedの値を反転させた新しいオブジェクトを返す
+  それ以外（対象外タスク）	何も変えずそのまま返す
+  */
+
+  const handleDelete = (id: number) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+  /*
+  filter()とは？
+  配列の中身をフィルタリング（絞り込み）して新しい配列を作る関数です
+  ルールに当てはまったものだけ残す
+  task.id !== id（＝削除対象ではないタスク）だけを残す
+  つまり
+  「削除したいタスク（idが一致するタスク）」を除外して、
+  「それ以外のタスクだけ」新しい配列にして残す。
+  */
+
+  /*
+  Reactでは
+「直接配列をいじらないで、新しい配列を作ってstateを更新する」
+これが超重要なルールです。（immutable＝不変性）
+今回のmap()もfilter()も、**常に「新しい配列」を作っています。
+ここがすごく大事なポイントです！
+  */
+
+const [apiMessage, setApiMessage] = useState('');
+
+useEffect(() => {
+  fetch('/api/hello')
+  .then((res) => res.json())  // 1回目のthen（レスポンスをJSONに変換）
+  .then((data) => setApiMessage(data.message))  // 2回目のthen（JSONデータを受け取って処理）
+  .catch((err) => console.error(err));
+  /*
+  thenとは
+  Promise（約束オブジェクト） が「成功（resolved）」した時に実行される処理を指定する
+  fetch()も、res.json()も、両方Promiseを返してる
+
+  1個目のthen → レスポンスをJSONに変換する
+  2個目のthen → 変換後のデータから欲しい情報を取り出す
+
+  catchとは
+  Promiseの中でエラーが発生したときに実行される処理を指定する
+  ネットワークエラーや、APIサーバーからエラー応答が返ったときに発動する
+
+  then	成功したらこれやって！
+  catch	失敗したらこれやって！
+  */
+}
+)
+
+  return (
+    <main className="p-8">
+      <h1 className="text-2xl font-bold mb-4">タスク管理アプリ</h1>
+      <p className="mb-4 text-green-600">APIから取得：{apiMessage}</p>
+      <div className="mb-4">
+        <input
+          className="border p-2 mr-2"
+          type="text"
+          placeholder="新しいタスクを入力"
+          value={newTaskTitle}
+          onChange={(e) => setNewTaskTitle(e.target.value)}
+        />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleAddTask}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          追加
+        </button>
+      </div>
+
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id} className="flex items-center mb-2">
+            <span
+              className={`flex-1 ${task.completed ? 'line-through text-gray-400' : ''}`}
+            >
+              {task.title}
+            </span>
+            <button
+              className="bg-green-500 text-white px-2 py-1 rounded mr-2"
+              onClick={() => handleToggleComplete(task.id)}
+            >
+              完了
+            </button>
+            <button
+              className="bg-red-500 text-white px-2 py-1 rounded"
+              onClick={() => handleDelete(task.id)}
+            >
+              削除
+            </button>
+          </li>
+        ))}
+      </ul>
+    </main>
   );
 }

@@ -43,40 +43,75 @@ setNewTaskTitleで、フォームに文字を入力するたびに更新する�
 まとめ：「ユーザーが今書いてるタスクの名前を保持」
   */
 
-  const handleAddTask = () => {
-    /* タスク追加ボタンを押したときに実行される関数。*/
-    if (!newTaskTitle.trim()) return;
-    /* 
-入力されたタイトルの前後空白を除去
-もし完全に空なら何もしないで終了（タスク追加しない）
-   */
-    const newTask: Task = {
-      /*
-      新しいタスクデータを作っている。
-      ここで1個のタスクオブジェクト（Task型）を生成してる。 
-      */
-      id: Date.now(),/* 今この瞬間のタイムスタンプ（ミリ秒単位）を使って一意のIDを作成している。 */
-      title: newTaskTitle.trim(), /* ユーザーが入力した文字列を、空白除去してそのままタイトルにセットしている。 */
-      completed: false, /* まだ完了していないので、初期状態は必ずfalseにする。 */
-    };
-    setTasks([...tasks, newTask]);
-    /*
-    今のtasks配列を**展開（スプレッド構文）**して
-    その末尾にnewTaskを追加して、新しい配列にして更新している。
-    （Reactでは**直接配列をいじらず、「新しい配列を作ってsetする」**のが原則）
-    */
-    setNewTaskTitle('');
-    /*
-    タスクを追加した後、
-    フォームの入力欄を空にリセットしている。
-    */
-  };
+ // Supabase APIからGET
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const res = await fetch('/api/tasks')
+      const data = await res.json()
+      setTasks(data)
+    }
+    fetchTasks()
+  }, [])
 
-  const handleToggleComplete = (id: number) => {
+  //POST
+  const handleAddTask = async () => {
+    if (!newTaskTitle.trim()) return
+    const res = await fetch('/api/tasks', {
+      method: 'POST',
+      body: JSON.stringify({ title: newTaskTitle.trim() }),
+    })
+    const newTask = await res.json()
+    setTasks([...tasks, newTask])
+    setNewTaskTitle('')
+  }
+
+
+//   const handleAddTask = () => {
+//     /* タスク追加ボタンを押したときに実行される関数。*/
+//     if (!newTaskTitle.trim()) return;
+//     /* 
+// 入力されたタイトルの前後空白を除去
+// もし完全に空なら何もしないで終了（タスク追加しない）
+//    */
+//     const newTask: Task = {
+//       /*
+//       新しいタスクデータを作っている。
+//       ここで1個のタスクオブジェクト（Task型）を生成してる。 
+//       */
+//       id: Date.now(),/* 今この瞬間のタイムスタンプ（ミリ秒単位）を使って一意のIDを作成している。 */
+//       title: newTaskTitle.trim(), /* ユーザーが入力した文字列を、空白除去してそのままタイトルにセットしている。 */
+//       completed: false, /* まだ完了していないので、初期状態は必ずfalseにする。 */
+//     };
+//     setTasks([...tasks, newTask]);
+//     /*
+//     今のtasks配列を**展開（スプレッド構文）**して
+//     その末尾にnewTaskを追加して、新しい配列にして更新している。
+//     （Reactでは**直接配列をいじらず、「新しい配列を作ってsetする」**のが原則）
+//     */
+//     setNewTaskTitle('');
+//     /*
+//     タスクを追加した後、
+//     フォームの入力欄を空にリセットしている。
+//     */
+//   };
+
+//PUT
+  const handleToggleComplete = async (id: number, completed: boolean) => {
+    await fetch('/api/tasks', {
+      method: 'PUT',
+      body: JSON.stringify({ id, completed: !completed }),
+    })
     setTasks(tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
-  };
+      task.id === id ? { ...task, completed: !completed } : task
+    ))
+  }
+
+
+  // const handleToggleComplete = (id: number) => {
+  //   setTasks(tasks.map(task =>
+  //     task.id === id ? { ...task, completed: !task.completed } : task
+  //   ));
+  // };
   /*
   id（クリックされたタスクのID）を受け取る
   tasks配列をmap()で全件ループ
@@ -84,10 +119,18 @@ setNewTaskTitleで、フォームに文字を入力するたびに更新する�
   task.id === id（対象タスク）	completedの値を反転させた新しいオブジェクトを返す
   それ以外（対象外タスク）	何も変えずそのまま返す
   */
+  const handleDelete = async (id: number) => {
+    await fetch('/api/tasks', {
+      method: 'DELETE',
+      body: JSON.stringify({ id }),
+    })
+    setTasks(tasks.filter(task => task.id !== id))
+  }
 
-  const handleDelete = (id: number) => {
-    setTasks(tasks.filter(task => task.id !== id));
-  };
+
+  // const handleDelete = (id: number) => {
+  //   setTasks(tasks.filter(task => task.id !== id));
+  // };
   /*
   filter()とは？
   配列の中身をフィルタリング（絞り込み）して新しい配列を作る関数です
@@ -161,7 +204,7 @@ useEffect(() => {
             </span>
             <button
               className="bg-green-500 text-white px-2 py-1 rounded mr-2"
-              onClick={() => handleToggleComplete(task.id)}
+              onClick={() => handleToggleComplete(task.id,task.completed)}
             >
               完了
             </button>

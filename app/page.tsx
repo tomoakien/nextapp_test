@@ -26,7 +26,7 @@ Next.jsでは、
 /app/page.tsx に export defaultされたコンポーネントが
 自動的に**トップページ ("/")**に対応する仕組みになってる。
 まとめ：「トップページに表示するコンポーネント(Home)を定義して外に出している」
-  */ 
+  */
   const [tasks, setTasks] = useState<Task[]>([]);
   /*
 **tasks＝タスク一覧（配列）**のデータを持つ
@@ -43,7 +43,7 @@ setNewTaskTitleで、フォームに文字を入力するたびに更新する�
 まとめ：「ユーザーが今書いてるタスクの名前を保持」
   */
 
- // Supabase APIからGET
+  // Supabase APIからGET
   useEffect(() => {
     const fetchTasks = async () => {
       const res = await fetch('/api/tasks')
@@ -66,36 +66,36 @@ setNewTaskTitleで、フォームに文字を入力するたびに更新する�
   }
 
 
-//   const handleAddTask = () => {
-//     /* タスク追加ボタンを押したときに実行される関数。*/
-//     if (!newTaskTitle.trim()) return;
-//     /* 
-// 入力されたタイトルの前後空白を除去
-// もし完全に空なら何もしないで終了（タスク追加しない）
-//    */
-//     const newTask: Task = {
-//       /*
-//       新しいタスクデータを作っている。
-//       ここで1個のタスクオブジェクト（Task型）を生成してる。 
-//       */
-//       id: Date.now(),/* 今この瞬間のタイムスタンプ（ミリ秒単位）を使って一意のIDを作成している。 */
-//       title: newTaskTitle.trim(), /* ユーザーが入力した文字列を、空白除去してそのままタイトルにセットしている。 */
-//       completed: false, /* まだ完了していないので、初期状態は必ずfalseにする。 */
-//     };
-//     setTasks([...tasks, newTask]);
-//     /*
-//     今のtasks配列を**展開（スプレッド構文）**して
-//     その末尾にnewTaskを追加して、新しい配列にして更新している。
-//     （Reactでは**直接配列をいじらず、「新しい配列を作ってsetする」**のが原則）
-//     */
-//     setNewTaskTitle('');
-//     /*
-//     タスクを追加した後、
-//     フォームの入力欄を空にリセットしている。
-//     */
-//   };
+  //   const handleAddTask = () => {
+  //     /* タスク追加ボタンを押したときに実行される関数。*/
+  //     if (!newTaskTitle.trim()) return;
+  //     /* 
+  // 入力されたタイトルの前後空白を除去
+  // もし完全に空なら何もしないで終了（タスク追加しない）
+  //    */
+  //     const newTask: Task = {
+  //       /*
+  //       新しいタスクデータを作っている。
+  //       ここで1個のタスクオブジェクト（Task型）を生成してる。 
+  //       */
+  //       id: Date.now(),/* 今この瞬間のタイムスタンプ（ミリ秒単位）を使って一意のIDを作成している。 */
+  //       title: newTaskTitle.trim(), /* ユーザーが入力した文字列を、空白除去してそのままタイトルにセットしている。 */
+  //       completed: false, /* まだ完了していないので、初期状態は必ずfalseにする。 */
+  //     };
+  //     setTasks([...tasks, newTask]);
+  //     /*
+  //     今のtasks配列を**展開（スプレッド構文）**して
+  //     その末尾にnewTaskを追加して、新しい配列にして更新している。
+  //     （Reactでは**直接配列をいじらず、「新しい配列を作ってsetする」**のが原則）
+  //     */
+  //     setNewTaskTitle('');
+  //     /*
+  //     タスクを追加した後、
+  //     フォームの入力欄を空にリセットしている。
+  //     */
+  //   };
 
-//PUT
+  //PUT
   const handleToggleComplete = async (id: number, completed: boolean) => {
     await fetch('/api/tasks', {
       method: 'PUT',
@@ -149,30 +149,30 @@ setNewTaskTitleで、フォームに文字を入力するたびに更新する�
 ここがすごく大事なポイントです！
   */
 
-const [apiMessage, setApiMessage] = useState('');
+  const [apiMessage, setApiMessage] = useState('');
 
-useEffect(() => {
-  fetch('/api/hello')
-  .then((res) => res.json())  // 1回目のthen（レスポンスをJSONに変換）
-  .then((data) => setApiMessage(data.message))  // 2回目のthen（JSONデータを受け取って処理）
-  .catch((err) => console.error(err));
-  /*
-  thenとは
-  Promise（約束オブジェクト） が「成功（resolved）」した時に実行される処理を指定する
-  fetch()も、res.json()も、両方Promiseを返してる
-
-  1個目のthen → レスポンスをJSONに変換する
-  2個目のthen → 変換後のデータから欲しい情報を取り出す
-
-  catchとは
-  Promiseの中でエラーが発生したときに実行される処理を指定する
-  ネットワークエラーや、APIサーバーからエラー応答が返ったときに発動する
-
-  then	成功したらこれやって！
-  catch	失敗したらこれやって！
-  */
-}
-)
+  // useEffect(() => {
+  //   fetch('/api/hello')
+  //     .then((res) => res.json())  // 1回目のthen（レスポンスをJSONに変換）
+  //     .then((data) => setApiMessage(data.message))  // 2回目のthen（JSONデータを受け取って処理）
+  //     .catch((err) => console.error(err));
+  //   /*
+  //   thenとは
+  //   Promise（約束オブジェクト） が「成功（resolved）」した時に実行される処理を指定する
+  //   fetch()も、res.json()も、両方Promiseを返してる
+  
+  //   1個目のthen → レスポンスをJSONに変換する
+  //   2個目のthen → 変換後のデータから欲しい情報を取り出す
+  
+  //   catchとは
+  //   Promiseの中でエラーが発生したときに実行される処理を指定する
+  //   ネットワークエラーや、APIサーバーからエラー応答が返ったときに発動する
+  
+  //   then	成功したらこれやって！
+  //   catch	失敗したらこれやって！
+  //   */
+  // }
+  // )
 
   return (
     <main className="p-8">
@@ -195,16 +195,16 @@ useEffect(() => {
       </div>
 
       <ul>
-         {tasks.map(task => (
+        {tasks.map(task => (
           <li key={task.id}>
             <input
-            type="checkbox"checked={task.completed}onChange={() => handleToggleComplete(task.id, task.completed)}
+              type="checkbox" checked={task.completed} onChange={() => handleToggleComplete(task.id, task.completed)}
             />
-      {task.title}
-      <button onClick={() => handleDelete(task.id)}>削除</button>
-    </li>
-  ))}
-</ul>
+            {task.title}
+            <button onClick={() => handleDelete(task.id)}>削除</button>
+          </li>
+        ))}
+      </ul>
 
     </main>
   );

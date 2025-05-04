@@ -195,28 +195,17 @@ useEffect(() => {
       </div>
 
       <ul>
-        {tasks.map((task) => (
-          <li key={task.id} className="flex items-center mb-2">
-            <span
-              className={`flex-1 ${task.completed ? 'line-through text-gray-400' : ''}`}
-            >
-              {task.title}
-            </span>
-            <button
-              className="bg-green-500 text-white px-2 py-1 rounded mr-2"
-              onClick={() => handleToggleComplete(task.id,task.completed)}
-            >
-              完了
-            </button>
-            <button
-              className="bg-red-500 text-white px-2 py-1 rounded"
-              onClick={() => handleDelete(task.id)}
-            >
-              削除
-            </button>
-          </li>
-        ))}
-      </ul>
+         {tasks.map(task => (
+          <li key={task.id}>
+            <input
+            type="checkbox"checked={task.completed}onChange={() => handleToggleComplete(task.id, task.completed)}
+            />
+      {task.title}
+      <button onClick={() => handleDelete(task.id)}>削除</button>
+    </li>
+  ))}
+</ul>
+
     </main>
   );
 }
